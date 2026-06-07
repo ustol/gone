@@ -48,6 +48,7 @@ export interface Database {
           image_url: string | null
           moderation_mode: 'auto' | 'manual'
           tribute_access: 'registered' | 'visitors'
+          wreath_board_enabled: boolean
           is_published: boolean
           tribute_count: number
           condolence_count: number
@@ -68,6 +69,7 @@ export interface Database {
           image_url?: string | null
           moderation_mode?: 'auto' | 'manual'
           tribute_access?: 'registered' | 'visitors'
+          wreath_board_enabled?: boolean
           is_published?: boolean
           tribute_count?: number
           condolence_count?: number
@@ -85,6 +87,7 @@ export interface Database {
           image_url?: string | null
           moderation_mode?: 'auto' | 'manual'
           tribute_access?: 'registered' | 'visitors'
+          wreath_board_enabled?: boolean
           is_published?: boolean
           tribute_count?: number
           condolence_count?: number
@@ -192,6 +195,16 @@ export interface Database {
 
 // Convenience types
 export type Profile = Database['public']['Tables']['profiles']['Row']
+
+export interface WreathPlacement {
+  id: string
+  announcement_id: string
+  user_id: string | null
+  guest_name: string | null
+  wreath_type: string
+  created_at: string
+  profiles?: { display_name: string | null; username: string } | null
+}
 
 export interface AnnouncementPhoto {
   id: string

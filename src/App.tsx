@@ -24,6 +24,7 @@ import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage'
 import DashboardPage from '@/pages/DashboardPage'
 import CreateAnnouncementPage from '@/pages/announcements/CreateAnnouncementPage'
 import EditAnnouncementPage from '@/pages/announcements/EditAnnouncementPage'
+import WreathBoardPage from '@/pages/announcements/WreathBoardPage'
 import ModerationPage from '@/pages/ModerationPage'
 import NotificationsPage from '@/pages/NotificationsPage'
 import ProfilePage from '@/pages/ProfilePage'
@@ -63,6 +64,7 @@ export default function App() {
                 <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                 <Route path="/announcements/create" element={<ProtectedRoute><CreateAnnouncementPage /></ProtectedRoute>} />
                 <Route path="/announcement/:slug/edit" element={<ProtectedRoute><EditAnnouncementPage /></ProtectedRoute>} />
+                <Route path="/announcement/:slug/wreaths" element={<WreathBoardPage />} />
                 <Route path="/dashboard/announcement/:announcementId/moderate" element={<ProtectedRoute><ModerationPage /></ProtectedRoute>} />
                 <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

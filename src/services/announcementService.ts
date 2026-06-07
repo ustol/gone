@@ -13,6 +13,7 @@ export interface CreateAnnouncementInput {
   image_file?: File
   moderation_mode: 'auto' | 'manual'
   tribute_access: 'registered' | 'visitors'
+  wreath_board_enabled: boolean
 }
 
 async function uploadImage(file: File, creatorId: string): Promise<string> {
@@ -54,6 +55,7 @@ export async function createAnnouncement(
       image_url,
       moderation_mode: input.moderation_mode,
       tribute_access: input.tribute_access,
+      wreath_board_enabled: input.wreath_board_enabled,
     })
     .select()
     .single()
@@ -123,6 +125,7 @@ export interface UpdateAnnouncementInput {
   image_file?: File
   moderation_mode: 'auto' | 'manual'
   tribute_access: 'registered' | 'visitors'
+  wreath_board_enabled: boolean
 }
 
 export async function updateAnnouncement(
@@ -147,6 +150,7 @@ export async function updateAnnouncement(
       short_message: input.short_message.trim(),
       moderation_mode: input.moderation_mode,
       tribute_access: input.tribute_access,
+      wreath_board_enabled: input.wreath_board_enabled,
       updated_at: new Date().toISOString(),
       ...(image_url ? { image_url } : {}),
     })

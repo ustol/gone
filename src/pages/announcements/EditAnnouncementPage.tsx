@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Upload, X, Loader2, ArrowLeft } from 'lucide-react'
+import { Upload, X, Loader2, ArrowLeft, Flower2 } from 'lucide-react'
 import { useAnnouncement, useUpdateAnnouncement } from '@/hooks/use-announcements'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/hooks/use-toast'
 
@@ -27,6 +28,7 @@ const schema = z.object({
   short_message: z.string().min(10, 'Message is too short').max(MAX_MESSAGE, `Max ${MAX_MESSAGE} characters`),
   moderation_mode: z.enum(['auto', 'manual']),
   tribute_access: z.enum(['registered', 'visitors']),
+  wreath_board_enabled: z.boolean(),
 })
 type FormData = z.infer<typeof schema>
 
@@ -60,6 +62,7 @@ export default function EditAnnouncementPage() {
         short_message: announcement.short_message,
         moderation_mode: announcement.moderation_mode,
         tribute_access: announcement.tribute_access,
+        wreath_board_enabled: announcement.wreath_board_enabled,
       })
     }
   }, [announcement, reset])
@@ -288,6 +291,26 @@ export default function EditAnnouncementPage() {
               </SelectContent>
             </Select>
           </CardContent>
+        </Card>
+
+        {/* Wreath Board */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Flower2 className="h-4 w-4 text-green-600" /> Wreath / Flower Board
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Allow visitors to lay virtual wreaths and flowers at a dedicated memorial board.
+                </CardDescription>
+              </div>
+              <Switch
+                checked={watch('wreath_board_enabled')}
+                onCheckedChange={(v) => setValue('wreath_board_enabled', v)}
+              />
+            </div>
+          </CardHeader>
         </Card>
 
         <div className="flex gap-3 justify-end">

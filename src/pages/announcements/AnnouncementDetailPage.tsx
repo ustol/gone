@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
-import { Calendar, MapPin, Heart, MessageSquare, ArrowLeft, Pencil } from 'lucide-react'
+import { Calendar, MapPin, Heart, MessageSquare, ArrowLeft, Pencil, Flower2 } from 'lucide-react'
 import { useAnnouncement } from '@/hooks/use-announcements'
 import { useAuth } from '@/contexts/AuthContext'
 import { formatDate, getAgeText, getInitials } from '@/lib/utils'
@@ -119,6 +119,13 @@ export default function AnnouncementDetailPage() {
                 <Link to={`/dashboard/announcement/${announcement.id}/moderate`}>Manage</Link>
               </Button>
             </>
+          )}
+          {announcement.wreath_board_enabled && (
+            <Button variant="outline" size="sm" asChild className="gap-1.5 border-green-700 text-green-700 hover:bg-green-50 dark:hover:bg-green-950">
+              <Link to={`/announcement/${announcement.slug}/wreaths`}>
+                <Flower2 className="h-3.5 w-3.5" /> Wreath Board
+              </Link>
+            </Button>
           )}
           <ShareMenu url={shareUrl} title={`In memory of ${fullName}`} />
         </div>
