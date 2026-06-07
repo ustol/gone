@@ -26,7 +26,7 @@ export default function AnnouncementCard({ announcement }: Props) {
           <img
             src={announcement.image_url}
             alt={fullName}
-            className="w-full h-full object-cover object-top"
+            className="w-full h-full object-contain"
             loading="lazy"
           />
         ) : (
