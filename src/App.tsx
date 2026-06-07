@@ -52,6 +52,9 @@ export default function App() {
               <Route path="/auth/callback" element={<AuthCallbackPage />} />
               <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
 
+              {/* Immersive full-screen (no layout) */}
+              <Route path="/announcement/:slug/wreaths" element={<WreathBoardPage />} />
+
               {/* Main layout */}
               <Route element={<Layout />}>
                 {/* Public */}
@@ -64,7 +67,6 @@ export default function App() {
                 <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                 <Route path="/announcements/create" element={<ProtectedRoute><CreateAnnouncementPage /></ProtectedRoute>} />
                 <Route path="/announcement/:slug/edit" element={<ProtectedRoute><EditAnnouncementPage /></ProtectedRoute>} />
-                <Route path="/announcement/:slug/wreaths" element={<WreathBoardPage />} />
                 <Route path="/dashboard/announcement/:announcementId/moderate" element={<ProtectedRoute><ModerationPage /></ProtectedRoute>} />
                 <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

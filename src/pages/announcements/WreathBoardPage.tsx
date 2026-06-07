@@ -14,18 +14,20 @@ import type { WreathPlacement } from '@/types/database'
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
 // The board is a fixed virtual canvas. Every wreath position is in px.
-// Rings are full 360° circles; spacing is computed to guarantee no overlap.
+// Wreaths are distributed across a 240° arc (CSS angles -30° → 210°, sweeping
+// through 0°=right, 90°=down/front, 180°=left). The upper 120° is excluded so
+// no wreath ever appears behind the tombstone.
 //
 // Wreath rendered size: 64 × 64 px icon + ~18 px label area below.
-// Minimum centre-to-centre distance needed: 72 px (icon width + 8 px gap).
+// Minimum centre-to-centre distance needed: 72 px.
 //
-// For each ring radius R and count N:
-//   chord between adjacent centres = 2R·sin(π/N)  ≥  72
+// For N points spread over 240° arc, spacing = 240/(N-1) deg.
+// Chord = 2R·sin(spacing/2)
 //
-// Ring 1  R=170 N=6   chord=170  ✓
-// Ring 2  R=280 N=10  chord=173  ✓
-// Ring 3  R=390 N=14  chord=173  ✓
-// Ring 4  R=500 N=18  chord=173  ✓
+// Ring 1  R=170 N=6   spacing=48°  chord=138 px ✓
+// Ring 2  R=280 N=10  spacing=26.7° chord=129 px ✓
+// Ring 3  R=390 N=14  spacing=18.5° chord=125 px ✓
+// Ring 4  R=500 N=18  spacing=14.1° chord=123 px ✓
 
 const CX = 520          // tombstone centre-X
 const CY = 440          // tombstone base-Y (where rings origin sits)
@@ -39,11 +41,15 @@ const STONE_BASE_FRAC = 228 / 260
 const TOMBSTONE_LEFT = CX - TOMBSTONE_W / 2
 const TOMBSTONE_TOP  = CY - TOMBSTONE_H * STONE_BASE_FRAC
 
+// Arc restricted to lower 240°: -30° (right) → 90° (front/down) → 210° (left)
+const ARC_START_DEG = -30
+const ARC_SPAN_DEG  = 240
+
 const RINGS = [
-  { radius: 170, count: 6,  startDeg: 0  },
-  { radius: 280, count: 10, startDeg: 18 },
-  { radius: 390, count: 14, startDeg: 12 },
-  { radius: 500, count: 18, startDeg:  6 },
+  { radius: 170, count: 6  },
+  { radius: 280, count: 10 },
+  { radius: 390, count: 14 },
+  { radius: 500, count: 18 },
 ]
 
 function getWreathXY(index: number): { x: number; y: number } {
@@ -51,15 +57,16 @@ function getWreathXY(index: number): { x: number; y: number } {
   for (const ring of RINGS) {
     if (index < total + ring.count) {
       const i = index - total
-      const deg = ring.startDeg + (i / ring.count) * 360
+      const n = ring.count
+      const deg = ARC_START_DEG + (n === 1 ? ARC_SPAN_DEG / 2 : (i / (n - 1)) * ARC_SPAN_DEG)
       const rad = (deg * Math.PI) / 180
       return { x: CX + ring.radius * Math.cos(rad), y: CY + ring.radius * Math.sin(rad) }
     }
     total += ring.count
   }
-  // Overflow: spiral outward
+  // Overflow
   const i = index - total
-  const deg = (i / 20) * 360
+  const deg = ARC_START_DEG + (i / 19) * ARC_SPAN_DEG
   const rad = (deg * Math.PI) / 180
   return { x: CX + 610 * Math.cos(rad), y: CY + 610 * Math.sin(rad) }
 }
@@ -104,10 +111,8 @@ function Tombstone({ firstName, surname, otherNames, dateOfBirth, dateOfDeath }:
 // ─── Placed wreath with price tag ─────────────────────────────────────────────
 
 function PlacedWreath({ placement, x, y }: { placement: WreathPlacement; x: number; y: number }) {
-  const config  = getWreathType(placement.wreath_type)
-  const name    = placement.profiles?.display_name ?? placement.profiles?.username ?? placement.guest_name ?? 'Visitor'
-  const isBehind = y < CY   // wreaths above ring origin appear "behind" stone
-  const zIndex   = isBehind ? 4 : 16
+  const config = getWreathType(placement.wreath_type)
+  const name   = placement.profiles?.display_name ?? placement.profiles?.username ?? placement.guest_name ?? 'Visitor'
 
   return (
     <div
@@ -121,9 +126,8 @@ function PlacedWreath({ placement, x, y }: { placement: WreathPlacement; x: numb
         flexDirection: 'column',
         alignItems: 'center',
         gap: 2,
-        zIndex,
-        opacity: isBehind ? 0.7 : 1,
-        transition: 'transform 0.2s, opacity 0.2s',
+        zIndex: 16,
+        transition: 'transform 0.2s',
         cursor: 'default',
       }}
       onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.transform = 'translate(-50%,-50%) scale(1.12)' }}
