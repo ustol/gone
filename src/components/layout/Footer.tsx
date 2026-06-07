@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Heart } from 'lucide-react'
+import { FMIcon } from '@/components/ui/FMLogo'
 
 export default function Footer() {
   return (
@@ -7,9 +8,19 @@ export default function Footer() {
       <div className="container py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="h-7 w-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">FM</div>
-              <span className="font-semibold">Funeral Matters</span>
+            <div className="flex items-center gap-2.5 mb-3">
+              <FMIcon size={36} />
+              <div>
+                <p
+                  className="font-bold text-base text-[#1c2f6b] dark:text-white leading-tight"
+                  style={{ fontFamily: "'Playfair Display', Georgia, 'Times New Roman', serif" }}
+                >
+                  Funeral Matters
+                </p>
+                <p className="text-[10px] text-muted-foreground tracking-wide" style={{ fontFamily: 'Georgia, serif' }}>
+                  Honouring Lives. Preserving Memories.
+                </p>
+              </div>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs">
               A dignified platform for honouring lives and preserving memories of those who have passed.

@@ -12,6 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { getInitials } from '@/lib/utils'
 import { useUnreadNotificationCount } from '@/hooks/use-notifications'
+import { FMIcon } from '@/components/ui/FMLogo'
 
 export default function Navbar() {
   const { user, profile, signOut } = useAuth()
@@ -35,9 +36,14 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 font-semibold text-lg">
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold">FM</div>
-          <span className="hidden sm:inline">Funeral Matters</span>
+        <Link to="/" className="flex items-center gap-2.5">
+          <FMIcon size={40} />
+          <span
+            className="hidden sm:inline text-lg font-bold tracking-wide text-[#1c2f6b] dark:text-white"
+            style={{ fontFamily: "'Playfair Display', Georgia, 'Times New Roman', serif" }}
+          >
+            Funeral Matters
+          </span>
         </Link>
 
         {/* Desktop nav */}
