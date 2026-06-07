@@ -108,7 +108,33 @@ function Tombstone({ firstName, surname, otherNames, dateOfBirth, dateOfDeath }:
   )
 }
 
-// ─── Placed wreath with price tag ─────────────────────────────────────────────
+// ─── Date formatting ──────────────────────────────────────────────────────────
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
+
+function ordinalSuffix(d: number): string {
+  if (d >= 11 && d <= 13) return 'th'
+  switch (d % 10) {
+    case 1: return 'st'
+    case 2: return 'nd'
+    case 3: return 'rd'
+    default: return 'th'
+  }
+}
+
+function WreathDate({ iso }: { iso: string }) {
+  const dt  = new Date(iso)
+  const day = dt.getDate()
+  const suf = ordinalSuffix(day)
+  return (
+    <span style={{ fontSize: 9, color: 'rgba(200,180,120,0.75)', fontStyle: 'italic', whiteSpace: 'nowrap' }}>
+      {day}<sup style={{ fontSize: 7, verticalAlign: 'super', lineHeight: 0 }}>{suf}</sup>
+      {' '}{MONTHS[dt.getMonth()]}, {dt.getFullYear()}
+    </span>
+  )
+}
+
+// ─── Placed wreath ────────────────────────────────────────────────────────────
 
 function PlacedWreath({ placement, x, y }: { placement: WreathPlacement; x: number; y: number }) {
   const config = getWreathType(placement.wreath_type)
@@ -116,7 +142,7 @@ function PlacedWreath({ placement, x, y }: { placement: WreathPlacement; x: numb
 
   return (
     <div
-      title={`${name} — GH₵ ${config.price}`}
+      title={name}
       style={{
         position: 'absolute',
         left: x,
@@ -133,37 +159,8 @@ function PlacedWreath({ placement, x, y }: { placement: WreathPlacement; x: numb
       onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.transform = 'translate(-50%,-50%) scale(1.12)' }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.transform = 'translate(-50%,-50%) scale(1)' }}
     >
-      {/* Wreath */}
       <div style={{ filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.6))' }}>
         <WreathIcon config={config} size={64} />
-      </div>
-
-      {/* Price tag */}
-      <div style={{
-        background: 'linear-gradient(135deg, #f5f0e0 0%, #ede8c0 100%)',
-        border: '1px solid #c8a030',
-        borderRadius: 4,
-        padding: '1px 7px',
-        fontSize: 9,
-        color: '#3a2810',
-        fontWeight: 700,
-        fontFamily: '"Courier New", Courier, monospace',
-        letterSpacing: 0.3,
-        boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
-        whiteSpace: 'nowrap',
-        position: 'relative',
-      }}>
-        {/* Tag string */}
-        <span style={{
-          position: 'absolute',
-          top: -5, left: '50%',
-          transform: 'translateX(-50%)',
-          width: 1,
-          height: 5,
-          background: '#c8a030',
-          display: 'block',
-        }} />
-        GH₵ {config.price}
       </div>
 
       {/* Placer name */}
@@ -172,7 +169,7 @@ function PlacedWreath({ placement, x, y }: { placement: WreathPlacement; x: numb
         fontWeight: 600,
         color: 'rgba(225,205,155,0.92)',
         textShadow: '0 1px 4px rgba(0,0,0,0.9)',
-        maxWidth: 72,
+        maxWidth: 80,
         textAlign: 'center',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -181,6 +178,9 @@ function PlacedWreath({ placement, x, y }: { placement: WreathPlacement; x: numb
       }}>
         {name}
       </div>
+
+      {/* Date laid */}
+      <WreathDate iso={placement.created_at} />
     </div>
   )
 }
