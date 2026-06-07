@@ -12,6 +12,7 @@ export interface CreateAnnouncementInput {
   short_message: string
   image_file?: File
   moderation_mode: 'auto' | 'manual'
+  tribute_access: 'registered' | 'visitors'
 }
 
 async function uploadImage(file: File, creatorId: string): Promise<string> {
@@ -52,6 +53,7 @@ export async function createAnnouncement(
       short_message: input.short_message.trim(),
       image_url,
       moderation_mode: input.moderation_mode,
+      tribute_access: input.tribute_access,
     })
     .select()
     .single()
@@ -120,6 +122,7 @@ export interface UpdateAnnouncementInput {
   short_message: string
   image_file?: File
   moderation_mode: 'auto' | 'manual'
+  tribute_access: 'registered' | 'visitors'
 }
 
 export async function updateAnnouncement(
@@ -143,6 +146,7 @@ export async function updateAnnouncement(
       place_of_death: input.place_of_death.trim(),
       short_message: input.short_message.trim(),
       moderation_mode: input.moderation_mode,
+      tribute_access: input.tribute_access,
       updated_at: new Date().toISOString(),
       ...(image_url ? { image_url } : {}),
     })

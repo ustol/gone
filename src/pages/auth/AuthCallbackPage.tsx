@@ -7,10 +7,21 @@ export default function AuthCallbackPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // onAuthStateChange fires after Supabase processes the #access_token hash
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        navigate('/dashboard', { replace: true })
+      } else if (event === 'PASSWORD_RECOVERY') {
+        navigate('/auth/reset-password', { replace: true })
+      }
+    })
+
+    // Fallback: if already signed in (page refresh), redirect immediately
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) navigate('/dashboard', { replace: true })
-      else navigate('/auth/login', { replace: true })
     })
+
+    return () => subscription.unsubscribe()
   }, [navigate])
 
   return (

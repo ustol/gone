@@ -41,6 +41,10 @@ export default function ModerationPage() {
     )
   }
 
+  function tributeDisplayName(tribute: TributeWithProfile) {
+    return tribute.profiles?.display_name ?? tribute.profiles?.username ?? tribute.guest_name ?? 'Visitor'
+  }
+
   function handleDelete(id: string) {
     deleteTribute(id, { onSuccess: () => toast({ title: 'Deleted' }) })
   }
@@ -60,12 +64,15 @@ export default function ModerationPage() {
       <Avatar className="h-9 w-9 flex-shrink-0">
         <AvatarImage src={tribute.profiles?.avatar_url ?? undefined} />
         <AvatarFallback className="text-xs">
-          {getInitials(tribute.profiles?.display_name ?? tribute.profiles?.username ?? 'U')}
+          {getInitials(tributeDisplayName(tribute))}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 mb-1">
-          <span className="text-sm font-medium">{tribute.profiles?.display_name ?? tribute.profiles?.username}</span>
+          <span className="text-sm font-medium">{tributeDisplayName(tribute)}</span>
+          {!tribute.author_id && (
+            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground">Guest</span>
+          )}
           <span className="text-xs text-muted-foreground">{formatRelativeTime(tribute.created_at)}</span>
           <Badge variant={tribute.type === 'tribute' ? 'default' : 'secondary'} className="text-[10px]">
             {tribute.type}

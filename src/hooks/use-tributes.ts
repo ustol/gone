@@ -38,7 +38,7 @@ export function useSubmitTribute(announcementId: string) {
 export function useUpdateTributeStatus(announcementId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, status, authorId }: { id: string; status: 'approved' | 'rejected'; authorId: string }) =>
+    mutationFn: ({ id, status, authorId }: { id: string; status: 'approved' | 'rejected'; authorId: string | null }) =>
       updateTributeStatus(id, status, authorId, announcementId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tributes', announcementId] })

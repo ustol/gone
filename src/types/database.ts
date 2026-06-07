@@ -47,6 +47,7 @@ export interface Database {
           short_message: string
           image_url: string | null
           moderation_mode: 'auto' | 'manual'
+          tribute_access: 'registered' | 'visitors'
           is_published: boolean
           tribute_count: number
           condolence_count: number
@@ -66,6 +67,7 @@ export interface Database {
           short_message: string
           image_url?: string | null
           moderation_mode?: 'auto' | 'manual'
+          tribute_access?: 'registered' | 'visitors'
           is_published?: boolean
           tribute_count?: number
           condolence_count?: number
@@ -82,6 +84,7 @@ export interface Database {
           short_message?: string
           image_url?: string | null
           moderation_mode?: 'auto' | 'manual'
+          tribute_access?: 'registered' | 'visitors'
           is_published?: boolean
           tribute_count?: number
           condolence_count?: number
@@ -92,7 +95,8 @@ export interface Database {
         Row: {
           id: string
           announcement_id: string
-          author_id: string
+          author_id: string | null
+          guest_name: string | null
           type: 'tribute' | 'condolence'
           message: string
           status: 'pending' | 'approved' | 'rejected'
@@ -102,7 +106,8 @@ export interface Database {
         Insert: {
           id?: string
           announcement_id: string
-          author_id: string
+          author_id?: string | null
+          guest_name?: string | null
           type: 'tribute' | 'condolence'
           message: string
           status?: 'pending' | 'approved' | 'rejected'
@@ -207,5 +212,5 @@ export type AnnouncementWithProfile = Announcement & {
 }
 
 export type TributeWithProfile = Tribute & {
-  profiles: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
+  profiles: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'> | null
 }

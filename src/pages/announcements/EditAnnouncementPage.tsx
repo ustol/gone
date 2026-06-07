@@ -26,6 +26,7 @@ const schema = z.object({
   place_of_death: z.string().min(2, 'Place of death is required').max(200),
   short_message: z.string().min(10, 'Message is too short').max(MAX_MESSAGE, `Max ${MAX_MESSAGE} characters`),
   moderation_mode: z.enum(['auto', 'manual']),
+  tribute_access: z.enum(['registered', 'visitors']),
 })
 type FormData = z.infer<typeof schema>
 
@@ -58,6 +59,7 @@ export default function EditAnnouncementPage() {
         place_of_death: announcement.place_of_death,
         short_message: announcement.short_message,
         moderation_mode: announcement.moderation_mode,
+        tribute_access: announcement.tribute_access,
       })
     }
   }, [announcement, reset])
@@ -224,11 +226,43 @@ export default function EditAnnouncementPage() {
           </CardContent>
         </Card>
 
+        {/* Who can post */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Who Can Post Tributes</CardTitle>
+            <CardDescription>Choose who is allowed to leave tributes and condolences.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Select
+              value={watch('tribute_access')}
+              onValueChange={(v) => setValue('tribute_access', v as 'registered' | 'visitors')}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="registered">
+                  <div>
+                    <div className="font-medium">Registered users only</div>
+                    <div className="text-xs text-muted-foreground">Only signed-in members can post</div>
+                  </div>
+                </SelectItem>
+                <SelectItem value="visitors">
+                  <div>
+                    <div className="font-medium">Everyone (including visitors)</div>
+                    <div className="text-xs text-muted-foreground">Anyone can post — all messages require your approval</div>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+
         {/* Moderation */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Tribute Moderation</CardTitle>
-            <CardDescription>Control how tributes are approved before becoming public.</CardDescription>
+            <CardDescription>Control how tributes from registered users are approved.</CardDescription>
           </CardHeader>
           <CardContent>
             <Select
