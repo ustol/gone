@@ -1,14 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#1c2f6b"/>
+  <!-- Navy rounded background -->
+  <rect width="64" height="64" rx="10" fill="#1c2f6b"/>
+
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#f0d880"/>
-      <stop offset="55%" stop-color="#c8a040"/>
-      <stop offset="100%" stop-color="#8a5f0e"/>
+    <linearGradient id="ff" x1="0.35" y1="0" x2="0.65" y2="1">
+      <stop offset="0%"  stop-color="#f8ee98"/>
+      <stop offset="30%" stop-color="#e8c848"/>
+      <stop offset="70%" stop-color="#c89828"/>
+      <stop offset="100%" stop-color="#a07018"/>
+    </linearGradient>
+    <linearGradient id="fg" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="rgba(255,255,230,0.85)"/>
+      <stop offset="100%" stop-color="rgba(255,255,230,0)"/>
+    </linearGradient>
+    <linearGradient id="fs" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#a07018"/>
+      <stop offset="50%"  stop-color="#e8c848"/>
+      <stop offset="100%" stop-color="#a07018"/>
     </linearGradient>
   </defs>
-  <path d="M32 8 C29 15,23 21,25 31 C27 23,31 19,32 13 C33 19,37 23,39 31 C41 21,35 15,32 8Z" fill="url(#g)"/>
-  <path d="M32 14 C30.5 19,27 22,28 28 C29 23,31 20,32 17 C33 20,35 23,36 28 C37 22,33.5 19,32 14Z" fill="rgba(255,252,210,0.45)"/>
-  <text x="32" y="55" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="23" font-weight="bold" fill="white" letter-spacing="-1">FM</text>
-  <path d="M8 52 C18 46,46 58,56 52" fill="none" stroke="url(#g)" stroke-width="2.2" stroke-linecap="round"/>
+
+  <!-- Flame outer -->
+  <path d="M32 5 C30 11,25 17,25.5 26 C26.5 21,30 17,32 13 C34 17,37.5 21,38.5 26 C39 17,34 11,32 5Z" fill="url(#ff)"/>
+  <!-- Flame glow -->
+  <path d="M32 9 C30.5 14,28 18,28.5 24 C29 20,31 17,32 14 C33 17,35 20,35.5 24 C36 18,33.5 14,32 9Z" fill="url(#fg)"/>
+
+  <!-- FM letters (Cinzel fallback to Georgia) -->
+  <text x="32" y="52" text-anchor="middle"
+        font-family="Cinzel,'Trajan Pro',Georgia,serif"
+        font-size="28" font-weight="700" letter-spacing="-1" fill="white">FM</text>
+
+  <!-- Swoosh -->
+  <path d="M7 56 C18 51,46 61,57 56" fill="none" stroke="url(#fs)" stroke-width="2" stroke-linecap="round"/>
 </svg>

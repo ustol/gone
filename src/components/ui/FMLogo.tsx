@@ -1,10 +1,11 @@
-// Inline SVG logo components — dark mode via CSS variable --logo-ink
+// FM logo SVG — transparent bg, dark-mode aware via CSS --logo-ink variable
+// Uses Cinzel Bold (loaded in index.css) to match the Roman serif letterforms in the brand logo.
 
-export function FMIcon({ size = 38 }: { size?: number }) {
-  const w = Math.round(size * (58 / 72))
+export function FMIcon({ size = 40 }: { size?: number }) {
+  const w = Math.round(size * (200 / 230))
   return (
     <svg
-      viewBox="0 0 58 72"
+      viewBox="0 0 200 230"
       width={w}
       height={size}
       xmlns="http://www.w3.org/2000/svg"
@@ -12,44 +13,74 @@ export function FMIcon({ size = 38 }: { size?: number }) {
       style={{ flexShrink: 0 }}
     >
       <defs>
-        <linearGradient id="fm-gold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#f0d880" />
-          <stop offset="55%"  stopColor="#c8a040" />
-          <stop offset="100%" stopColor="#8a5f0e" />
+        {/* Flame gradient — warm gold → amber → dark gold */}
+        <linearGradient id="fm-flame" x1="0.35" y1="0" x2="0.65" y2="1">
+          <stop offset="0%"   stopColor="#f8ee98" />
+          <stop offset="25%"  stopColor="#e8c848" />
+          <stop offset="65%"  stopColor="#c89828" />
+          <stop offset="100%" stopColor="#a07018" />
+        </linearGradient>
+        {/* Flame inner highlight */}
+        <linearGradient id="fm-glow" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%"   stopColor="rgba(255,255,230,0.85)" />
+          <stop offset="70%"  stopColor="rgba(255,240,180,0.2)"  />
+          <stop offset="100%" stopColor="rgba(255,240,180,0)"    />
+        </linearGradient>
+        {/* Swoosh — dark gold → bright gold → dark gold */}
+        <linearGradient id="fm-swoosh" x1="0" y1="0.5" x2="1" y2="0.5">
+          <stop offset="0%"   stopColor="#a07018" />
+          <stop offset="40%"  stopColor="#e8c848" />
+          <stop offset="60%"  stopColor="#e8c848" />
+          <stop offset="100%" stopColor="#a07018" />
         </linearGradient>
       </defs>
 
-      {/* Outer flame */}
+      {/* ── Flame ── */}
+      {/* Outer body: tall teardrop, tapers to sharp tip */}
       <path
-        d="M29 4 C25.5 13,19 20,21 31 C23 23,28 18,29 12 C30 18,35 23,37 31 C39 20,32.5 13,29 4Z"
-        fill="url(#fm-gold)"
+        d="
+          M100 6
+          C97 17, 86 30, 87 50
+          C88 41, 93 34, 100 24
+          C107 34, 112 41, 113 50
+          C114 30, 103 17, 100 6Z
+        "
+        fill="url(#fm-flame)"
       />
-      {/* Flame inner glow */}
+      {/* Inner glow — brighter centre core */}
       <path
-        d="M29 11 C27.5 17,24 21,25 28 C26 23,28 20,29 16 C30 20,32 23,33 28 C34 21,30.5 17,29 11Z"
-        fill="rgba(255,252,210,0.45)"
+        d="
+          M100 15
+          C98 23, 93 31, 94 44
+          C95 37, 98 32, 100 26
+          C102 32, 105 37, 106 44
+          C107 31, 102 23, 100 15Z
+        "
+        fill="url(#fm-glow)"
       />
 
-      {/* FM monogram */}
+      {/* ── FM Monogram ── */}
+      {/* Cinzel Bold — closest freely available match to the logo's Roman serif */}
       <text
-        x="29"
-        y="63"
+        x="100"
+        y="168"
         textAnchor="middle"
-        fontFamily="Georgia,'Times New Roman',serif"
-        fontSize="33"
-        fontWeight="bold"
-        letterSpacing="-1"
+        fontFamily="Cinzel, 'Trajan Pro', Georgia, 'Times New Roman', serif"
+        fontSize="90"
+        fontWeight="700"
+        letterSpacing="-3"
         fill="var(--logo-ink, #1c2f6b)"
       >
         FM
       </text>
 
-      {/* Gold swoosh */}
+      {/* ── Swoosh ── */}
+      {/* Elegant S-curve beneath the letters, matching the logo's calligraphic flourish */}
       <path
-        d="M5 60 C15 54,43 66,53 60"
+        d="M22 182 C60 168, 140 194, 178 180"
         fill="none"
-        stroke="url(#fm-gold)"
-        strokeWidth="2.5"
+        stroke="url(#fm-swoosh)"
+        strokeWidth="3.2"
         strokeLinecap="round"
       />
     </svg>
