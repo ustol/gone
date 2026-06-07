@@ -187,6 +187,16 @@ export interface Database {
 
 // Convenience types
 export type Profile = Database['public']['Tables']['profiles']['Row']
+
+export interface AnnouncementPhoto {
+  id: string
+  announcement_id: string
+  url: string
+  storage_path: string
+  caption: string | null
+  uploaded_by: string
+  created_at: string
+}
 export type Announcement = Database['public']['Tables']['announcements']['Row']
 export type Tribute = Database['public']['Tables']['tributes']['Row']
 export type Notification = Database['public']['Tables']['notifications']['Row']

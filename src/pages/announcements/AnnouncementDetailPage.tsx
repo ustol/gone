@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
-import { Calendar, MapPin, Heart, MessageSquare, ArrowLeft } from 'lucide-react'
+import { Calendar, MapPin, Heart, MessageSquare, ArrowLeft, Pencil } from 'lucide-react'
 import { useAnnouncement } from '@/hooks/use-announcements'
 import { useAuth } from '@/contexts/AuthContext'
 import { formatDate, getAgeText, getInitials } from '@/lib/utils'
@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import TributeSection from '@/components/tributes/TributeSection'
 import ShareMenu from '@/components/announcements/ShareMenu'
+import PhotoGallery from '@/components/announcements/PhotoGallery'
 
 export default function AnnouncementDetailPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -55,7 +56,7 @@ export default function AnnouncementDetailPage() {
       {/* Hero image */}
       <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 mb-8">
         {announcement.image_url ? (
-          <img src={announcement.image_url} alt={fullName} className="w-full h-full object-cover object-top" />
+          <img src={announcement.image_url} alt={fullName} className="w-full h-full object-contain" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <div className="h-28 w-28 rounded-full bg-primary/10 flex items-center justify-center text-4xl font-semibold text-primary">
@@ -108,9 +109,16 @@ export default function AnnouncementDetailPage() {
 
         <div className="flex items-center gap-2">
           {isOwner && (
-            <Button variant="outline" size="sm" asChild>
-              <Link to={`/dashboard/announcement/${announcement.id}/moderate`}>Manage</Link>
-            </Button>
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <Link to={`/announcement/${announcement.slug}/edit`}>
+                  <Pencil className="h-3.5 w-3.5 mr-1.5" /> Edit
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to={`/dashboard/announcement/${announcement.id}/moderate`}>Manage</Link>
+              </Button>
+            </>
           )}
           <ShareMenu url={shareUrl} title={`In memory of ${fullName}`} />
         </div>
@@ -133,6 +141,13 @@ export default function AnnouncementDetailPage() {
         {announcement.moderation_mode === 'manual' && (
           <Badge variant="secondary" className="ml-auto">Moderated</Badge>
         )}
+      </div>
+
+      <Separator className="mb-8" />
+
+      {/* Photo Gallery */}
+      <div className="mb-10">
+        <PhotoGallery announcementId={announcement.id} isOwner={isOwner} />
       </div>
 
       <Separator className="mb-8" />

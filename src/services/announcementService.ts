@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { generateSlug } from '@/lib/utils'
-import type { Announcement, AnnouncementWithProfile } from '@/types/database'
+import type { Announcement, AnnouncementWithProfile, AnnouncementPhoto } from '@/types/database'
 
 export interface CreateAnnouncementInput {
   surname: string
@@ -107,6 +107,91 @@ export async function updateModerationMode(
     .from('announcements')
     .update({ moderation_mode: mode })
     .eq('id', id)
+  if (error) throw error
+}
+
+export interface UpdateAnnouncementInput {
+  surname: string
+  first_name: string
+  other_names?: string
+  date_of_birth?: string
+  date_of_death: string
+  place_of_death: string
+  short_message: string
+  image_file?: File
+  moderation_mode: 'auto' | 'manual'
+}
+
+export async function updateAnnouncement(
+  id: string,
+  input: UpdateAnnouncementInput,
+  creatorId: string
+): Promise<Announcement> {
+  let image_url: string | undefined
+  if (input.image_file) {
+    image_url = await uploadImage(input.image_file, creatorId)
+  }
+
+  const { data, error } = await supabase
+    .from('announcements')
+    .update({
+      surname: input.surname.trim(),
+      first_name: input.first_name.trim(),
+      other_names: input.other_names?.trim() || null,
+      date_of_birth: input.date_of_birth || null,
+      date_of_death: input.date_of_death,
+      place_of_death: input.place_of_death.trim(),
+      short_message: input.short_message.trim(),
+      moderation_mode: input.moderation_mode,
+      updated_at: new Date().toISOString(),
+      ...(image_url ? { image_url } : {}),
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+export async function getGalleryPhotos(announcementId: string): Promise<AnnouncementPhoto[]> {
+  const { data, error } = await supabase
+    .from('announcement_photos')
+    .select('*')
+    .eq('announcement_id', announcementId)
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data ?? []
+}
+
+export async function addGalleryPhoto(
+  announcementId: string,
+  file: File,
+  creatorId: string,
+  caption?: string
+): Promise<AnnouncementPhoto> {
+  const ext = file.name.split('.').pop()
+  const path = `${creatorId}/gallery/${Date.now()}.${ext}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('deceased-images')
+    .upload(path, file, { cacheControl: '3600', upsert: false })
+  if (uploadError) throw uploadError
+
+  const { data: { publicUrl } } = supabase.storage.from('deceased-images').getPublicUrl(path)
+
+  const { data, error } = await supabase
+    .from('announcement_photos')
+    .insert({ announcement_id: announcementId, url: publicUrl, storage_path: path, caption: caption || null, uploaded_by: creatorId })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteGalleryPhoto(photoId: string, storagePath: string): Promise<void> {
+  await supabase.storage.from('deceased-images').remove([storagePath])
+  const { error } = await supabase.from('announcement_photos').delete().eq('id', photoId)
   if (error) throw error
 }
 
