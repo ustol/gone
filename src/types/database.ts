@@ -215,6 +215,19 @@ export interface AnnouncementPhoto {
   uploaded_by: string
   created_at: string
 }
+
+export interface CommunityPhoto {
+  id: string
+  announcement_id: string
+  uploader_id: string | null
+  guest_name: string | null
+  url: string
+  storage_path: string
+  caption: string | null
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+  profiles?: { display_name: string | null; username: string } | null
+}
 export type Announcement = Database['public']['Tables']['announcements']['Row']
 export type Tribute = Database['public']['Tables']['tributes']['Row']
 export type Notification = Database['public']['Tables']['notifications']['Row']

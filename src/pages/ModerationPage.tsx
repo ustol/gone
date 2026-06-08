@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
-import { CheckCircle, XCircle, Trash2, ArrowLeft } from 'lucide-react'
+import { CheckCircle, XCircle, Trash2, ArrowLeft, UserCircle2 } from 'lucide-react'
 import { useAllTributesForOwner, useUpdateTributeStatus, useDeleteTribute } from '@/hooks/use-tributes'
+import { useAllCommunityPhotos, useUpdateCommunityPhotoStatus, useDeleteCommunityPhoto } from '@/hooks/use-community-photos'
 import { formatRelativeTime, getInitials } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -8,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/hooks/use-toast'
-import type { TributeWithProfile } from '@/types/database'
+import type { TributeWithProfile, CommunityPhoto } from '@/types/database'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { updateModerationMode } from '@/services/announcementService'
 import { useQueryClient } from '@tanstack/react-query'
@@ -18,10 +19,17 @@ export default function ModerationPage() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
-  // We need to fetch the announcement by id — repurpose the hook with id lookup
   const { data: tributesAll = [], isLoading } = useAllTributesForOwner(announcementId!)
   const { mutate: updateStatus, isPending: updatingStatus } = useUpdateTributeStatus(announcementId!)
   const { mutate: deleteTribute } = useDeleteTribute(announcementId!)
+
+  const { data: allPhotos = [], isLoading: photosLoading } = useAllCommunityPhotos(announcementId!)
+  const { mutate: updatePhotoStatus } = useUpdateCommunityPhotoStatus(announcementId!)
+  const { mutate: deletePhoto } = useDeleteCommunityPhoto(announcementId!)
+
+  const pendingPhotos  = allPhotos.filter((p) => p.status === 'pending')
+  const approvedPhotos = allPhotos.filter((p) => p.status === 'approved')
+  const rejectedPhotos = allPhotos.filter((p) => p.status === 'rejected')
 
   const pending = tributesAll.filter((t) => t.status === 'pending')
   const approved = tributesAll.filter((t) => t.status === 'approved')
@@ -113,6 +121,56 @@ export default function ModerationPage() {
     </div>
   )
 
+  function photoUploaderName(p: CommunityPhoto) {
+    return p.profiles?.display_name ?? p.profiles?.username ?? p.guest_name ?? 'Anonymous'
+  }
+
+  const PhotoCard = ({ photo }: { photo: CommunityPhoto }) => (
+    <div className="flex gap-3 p-3 rounded-lg border hover:bg-muted/30 transition-colors">
+      <img
+        src={photo.url}
+        alt={photoUploaderName(photo)}
+        className="h-20 w-20 rounded-md object-cover flex-shrink-0"
+      />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <UserCircle2 className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+          <span className="text-sm font-medium truncate">{photoUploaderName(photo)}</span>
+          {!photo.uploader_id && (
+            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground">Guest</span>
+          )}
+          <span className="text-xs text-muted-foreground ml-auto flex-shrink-0">
+            {formatRelativeTime(photo.created_at)}
+          </span>
+        </div>
+        {photo.caption && (
+          <p className="text-sm text-muted-foreground line-clamp-2">{photo.caption}</p>
+        )}
+      </div>
+      <div className="flex items-start gap-1.5 flex-shrink-0">
+        {photo.status !== 'approved' && (
+          <Button size="sm" variant="outline" className="h-8 gap-1 text-green-600 border-green-200 hover:bg-green-50"
+            onClick={() => updatePhotoStatus({ id: photo.id, status: 'approved' },
+              { onSuccess: () => toast({ title: 'Photo approved' }) })}>
+            <CheckCircle className="h-3.5 w-3.5" /> Approve
+          </Button>
+        )}
+        {photo.status !== 'rejected' && (
+          <Button size="sm" variant="outline" className="h-8 gap-1 text-red-600 border-red-200 hover:bg-red-50"
+            onClick={() => updatePhotoStatus({ id: photo.id, status: 'rejected' },
+              { onSuccess: () => toast({ title: 'Photo rejected' }) })}>
+            <XCircle className="h-3.5 w-3.5" /> {photo.status === 'approved' ? 'Revoke' : 'Reject'}
+          </Button>
+        )}
+        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+          onClick={() => deletePhoto({ id: photo.id, storagePath: photo.storage_path },
+            { onSuccess: () => toast({ title: 'Photo deleted' }) })}>
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    </div>
+  )
+
   return (
     <div className="container max-w-3xl py-10">
       <Link to="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6">
@@ -122,7 +180,7 @@ export default function ModerationPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Moderation Queue</h1>
-          <p className="text-sm text-muted-foreground mt-1">Review and manage tributes for this announcement.</p>
+          <p className="text-sm text-muted-foreground mt-1">Review tributes and community photo memories.</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Mode:</span>
@@ -138,30 +196,81 @@ export default function ModerationPage() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}</div>
-      ) : (
-        <Tabs defaultValue="pending">
-          <TabsList className="mb-6">
-            <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
-            <TabsTrigger value="approved">Approved ({approved.length})</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected ({rejected.length})</TabsTrigger>
-          </TabsList>
+      {/* Top-level: Tributes vs Photos */}
+      <Tabs defaultValue="tributes">
+        <TabsList className="mb-6">
+          <TabsTrigger value="tributes">
+            Tributes
+            {pending.length > 0 && (
+              <Badge variant="destructive" className="ml-1.5 h-4 min-w-[1rem] px-1 text-[10px]">
+                {pending.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="photos">
+            Photo Memories
+            {pendingPhotos.length > 0 && (
+              <Badge variant="destructive" className="ml-1.5 h-4 min-w-[1rem] px-1 text-[10px]">
+                {pendingPhotos.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
 
-          {[
-            { key: 'pending', items: pending },
-            { key: 'approved', items: approved },
-            { key: 'rejected', items: rejected },
-          ].map(({ key, items }) => (
-            <TabsContent key={key} value={key}>
-              {items.length === 0
-                ? <p className="text-sm text-muted-foreground text-center py-8">No {key} tributes.</p>
-                : <div className="space-y-3">{items.map((t) => <TributeRow key={t.id} tribute={t} />)}</div>
-              }
-            </TabsContent>
-          ))}
-        </Tabs>
-      )}
+        {/* ── Tributes tab ── */}
+        <TabsContent value="tributes">
+          {isLoading ? (
+            <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}</div>
+          ) : (
+            <Tabs defaultValue="pending">
+              <TabsList className="mb-4">
+                <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
+                <TabsTrigger value="approved">Approved ({approved.length})</TabsTrigger>
+                <TabsTrigger value="rejected">Rejected ({rejected.length})</TabsTrigger>
+              </TabsList>
+              {[
+                { key: 'pending',  items: pending  },
+                { key: 'approved', items: approved },
+                { key: 'rejected', items: rejected },
+              ].map(({ key, items }) => (
+                <TabsContent key={key} value={key}>
+                  {items.length === 0
+                    ? <p className="text-sm text-muted-foreground text-center py-8">No {key} tributes.</p>
+                    : <div className="space-y-3">{items.map((t) => <TributeRow key={t.id} tribute={t} />)}</div>
+                  }
+                </TabsContent>
+              ))}
+            </Tabs>
+          )}
+        </TabsContent>
+
+        {/* ── Photo Memories tab ── */}
+        <TabsContent value="photos">
+          {photosLoading ? (
+            <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}</div>
+          ) : (
+            <Tabs defaultValue="pending">
+              <TabsList className="mb-4">
+                <TabsTrigger value="pending">Pending ({pendingPhotos.length})</TabsTrigger>
+                <TabsTrigger value="approved">Approved ({approvedPhotos.length})</TabsTrigger>
+                <TabsTrigger value="rejected">Rejected ({rejectedPhotos.length})</TabsTrigger>
+              </TabsList>
+              {[
+                { key: 'pending',  items: pendingPhotos  },
+                { key: 'approved', items: approvedPhotos },
+                { key: 'rejected', items: rejectedPhotos },
+              ].map(({ key, items }) => (
+                <TabsContent key={key} value={key}>
+                  {items.length === 0
+                    ? <p className="text-sm text-muted-foreground text-center py-8">No {key} photo memories.</p>
+                    : <div className="space-y-3">{items.map((p) => <PhotoCard key={p.id} photo={p} />)}</div>
+                  }
+                </TabsContent>
+              ))}
+            </Tabs>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

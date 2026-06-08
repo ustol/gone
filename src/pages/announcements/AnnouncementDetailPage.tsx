@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import TributeSection from '@/components/tributes/TributeSection'
 import ShareMenu from '@/components/announcements/ShareMenu'
 import PhotoGallery from '@/components/announcements/PhotoGallery'
+import CommunityMemories from '@/components/announcements/CommunityMemories'
 
 export default function AnnouncementDetailPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -152,9 +153,16 @@ export default function AnnouncementDetailPage() {
 
       <Separator className="mb-8" />
 
-      {/* Photo Gallery */}
+      {/* Creator's photo gallery */}
       <div className="mb-10">
         <PhotoGallery announcementId={announcement.id} isOwner={isOwner} />
+      </div>
+
+      <Separator className="mb-8" />
+
+      {/* Community photo memories */}
+      <div className="mb-10">
+        <CommunityMemories announcementId={announcement.id} />
       </div>
 
       <Separator className="mb-8" />
