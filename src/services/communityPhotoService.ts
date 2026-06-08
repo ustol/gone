@@ -36,12 +36,12 @@ export async function submitCommunityPhoto(input: SubmitMemoryInput): Promise<Co
   const path = `community/${input.announcementId}/${folder}-${Date.now()}.${ext}`
 
   const { error: uploadError } = await supabase.storage
-    .from('announcements')
+    .from('deceased-images')
     .upload(path, input.file, { upsert: false })
   if (uploadError) throw uploadError
 
   const { data: { publicUrl } } = supabase.storage
-    .from('announcements')
+    .from('deceased-images')
     .getPublicUrl(path)
 
   const { data, error } = await supabase
@@ -73,7 +73,7 @@ export async function updateCommunityPhotoStatus(
 }
 
 export async function deleteCommunityPhoto(id: string, storagePath: string): Promise<void> {
-  await supabase.storage.from('announcements').remove([storagePath])
+  await supabase.storage.from('deceased-images').remove([storagePath])
   const { error } = await supabase.from('community_photos').delete().eq('id', id)
   if (error) throw error
 }

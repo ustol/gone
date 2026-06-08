@@ -59,10 +59,10 @@ create policy "community_photos_delete_creator"
     )
   );
 
--- Storage: allow anyone to upload to the community/ path in the announcements bucket
+-- Storage: allow anyone to upload to the community/ path in the deceased-images bucket
 create policy "community_photos_storage_insert"
   on storage.objects for insert
   with check (
-    bucket_id = 'announcements'
+    bucket_id = 'deceased-images'
     and (storage.foldername(name))[1] = 'community'
   );
